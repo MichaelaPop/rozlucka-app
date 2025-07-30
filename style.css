@@ -1,0 +1,181 @@
+/*
+ * Globální styly pro aplikaci rozlučky se svobodou.
+ *
+ * Používá decentní růžový gradient na pozadí a moderní písmo Poppins. Všechny karty
+ * mají zaoblené rohy a stíny pro plastický vzhled. Soustředili jsme se na
+ * responzivitu, aby bylo ovládání pohodlné i na mobilech.
+ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ffc4e0, #ffd7ec);
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Obal pro obsah stránky – centrovaná maximální šířka a odsazení */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Karty pro úkoly a skóre */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin-top: 0;
+  text-align: center;
+  font-size: 2em;
+  color: #e91e63;
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #e91e63;
+  font-size: 1.4em;
+}
+
+/* položky úkolů */
+.task-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.task-item:last-child {
+  margin-bottom: 0;
+}
+
+.task-item input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  accent-color: #e91e63;
+}
+
+.task-item label {
+  flex: 1;
+  font-size: 0.95em;
+}
+
+/* počet bodů u úkolu */
+.points {
+  color: #9c27b0;
+  font-size: 0.85em;
+  margin-left: 6px;
+}
+
+/* zobrazení počtu bodů */
+.score-display {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+/* progress bar */
+.progress-container {
+  width: 100%;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #e91e63;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* tabulka skóre */
+#scoreboard {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#scoreboard th, #scoreboard td {
+  padding: 8px;
+  text-align: left;
+}
+
+#scoreboard thead {
+  background-color: #f3f3f3;
+}
+
+#scoreboard tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#scoreboard tbody tr.top-scorer {
+  background-color: #fff7c7;
+  font-weight: bold;
+}
+
+#scoreboard tbody tr.current-user {
+  background-color: #ffe4ec;
+}
+
+/* Motivační hlášky */
+.message {
+  margin-top: 10px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #d81b60;
+}
+
+/* seznam účastnic na domovské stránce */
+.participants-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.participant-link {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #e91e63;
+  font-weight: 600;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.participant-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.6em;
+  }
+  h2 {
+    font-size: 1.2em;
+  }
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .task-item input[type="checkbox"] {
+    margin-bottom: 6px;
+  }
+  .participant-link {
+    flex: 1 1 calc(50% - 20px);
+    text-align: center;
+  }
+}

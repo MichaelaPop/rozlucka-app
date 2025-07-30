@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rozlučka – Mája</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Rozlučka – <span id="participant-name">Mája</span></h1>
+    <div class="card">
+      <h2>Úkoly</h2>
+      <div id="tasks-list"></div>
+      <div class="score-display">Body: <span id="score-value">0</span></div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div id="motivational-message" class="message"></div>
+    </div>
+    <div class="card">
+      <h2>Skóre</h2>
+      <table id="scoreboard">
+        <thead>
+          <tr><th>Jméno</th><th>Body</th></tr>
+        </thead>
+        <tbody id="scoreboard-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      setupPage('Mája');
+    });
+  </script>
+</body>
+</html>
