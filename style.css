@@ -136,6 +136,20 @@ h2 {
   color: #d81b60;
 }
 
+/* Odkaz pro nahrávání fotek
+ * Zobrazuje se pod seznamem úkolů a bodovacím panelem.
+ */
+.upload-link {
+  display: block;
+  margin-top: 12px;
+  color: #e91e63;
+  font-weight: 600;
+  text-decoration: none;
+}
+.upload-link:hover {
+  text-decoration: underline;
+}
+
 /* seznam účastnic na domovské stránce */
 .participants-list {
   display: flex;

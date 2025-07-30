@@ -8,11 +8,15 @@
  */
 
 // Seznam úkolů a bodů
+// Seznam úkolů pro jednotlivé účastnice.  Upravený podle zpětné vazby:
+//  - první úkol používá tvar „vymysleme“ a správný tvar „týpka“
+//  - čtvrtý úkol má opravený tvar na „týpkem“
+//  - přidány dva nové úkoly se společnou fotkou se šesti Tomy a bláznivou selfie s mnoha Tomy
 const tasks = [
-  { description: 'Společně vymyslete jméno pro vašeho típka.', points: 5 },
+  { description: 'Společně vymysleme jméno pro vašeho týpka.', points: 5 },
   { description: 'Udělejme společnou fotku "Před".', points: 5 },
   { description: 'Vyfoť se s nevěstou v originální póze.', points: 10 },
-  { description: 'Udělej si crazy fotku s naším típkem.', points: 15 },
+  { description: 'Udělej si crazy fotku s naším týpkem.', points: 15 },
   { description: 'Vyfoť tajně nejulítlejší outfit večera.', points: 20 },
   { description: 'Vyfoť tajně někoho, kdo vypadá jako známá osobnost.', points: 20 },
   { description: 'Udělej si selfie s naprostým cizincem.', points: 30 },
@@ -20,7 +24,10 @@ const tasks = [
   { description: 'Vyfoť tajně holku, která má na sobě víc růžové než ty.', points: 15 },
   { description: 'Zachyť nejvíc znechucený výraz večera.', points: 20 },
   { description: 'Vyfoť náhodnou věc, která připomíná penis.', points: 25 },
-  { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 }
+  { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 },
+  // Nové úkoly přidané pro další body navíc
+  { description: 'Udělejme fotku se šesti Tomy a nevěstou.', points: 10 },
+  { description: 'Udělej bláznivou selfie s co největším počtem Tomů.', points: 15 }
 ];
 
 // Celkový počet bodů – slouží pro výpočet procent v progress baru
@@ -33,19 +40,22 @@ const MAX_POINTS = tasks.reduce((sum, t) => sum + t.points, 0);
  * @returns {string} Text hlášky
  */
 function getMotivationalMessage(score) {
+  // Motivace je odstupňovaná podle počtu získaných bodů.  Přidali jsme
+  // extra stupeň pro nejvyšší skóre nad 170 bodů, aby se správně
+  // zohlednil vyšší maximální počet bodů po přidání nových úkolů.
   if (!score || score === 0) {
     return 'Holka, začni! Tohle není kavárna.';
-  }
-  if (score <= 30) {
+  } else if (score <= 30) {
     return 'Už to jiskří, ale chce to přidat!';
-  }
-  if (score <= 70) {
+  } else if (score <= 70) {
     return 'Rozjíždíš to! Jsi na dobré cestě ke slávě!';
-  }
-  if (score <= 120) {
+  } else if (score <= 120) {
     return 'Už jsi legenda večera… skoro!';
+  } else if (score <= 170) {
+    return '🔥 Královno chaosu! Ostatní nestíhají!';
   }
-  return '🔥 Královno chaosu! Ostatní nestíhají!';
+  // Nad 170 bodů udělujeme speciální titul ultrapařmenky
+  return '🔥🔥🔥Získáváš titul korunovaná ultrapařmenka!🔥🔥🔥';
 }
 
 /**
