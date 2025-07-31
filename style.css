@@ -52,37 +52,31 @@ h2 {
   align-items: center;
   margin-bottom: 8px;
 }
-
 .task-item:last-child {
   margin-bottom: 0;
 }
-
 .task-item input[type="checkbox"] {
   width: 24px;
   height: 24px;
   margin-right: 10px;
   accent-color: #e91e63;
 }
-
 .task-item label {
   flex: 1;
   font-size: 0.95em;
 }
-
 /* počet bodů u úkolu */
 .points {
   color: #9c27b0;
   font-size: 0.85em;
   margin-left: 6px;
 }
-
 /* zobrazení počtu bodů */
 .score-display {
   margin-top: 10px;
   font-weight: 600;
   font-size: 1.1em;
 }
-
 /* progress bar */
 .progress-container {
   width: 100%;
@@ -92,42 +86,35 @@ h2 {
   height: 20px;
   margin-top: 10px;
 }
-
 .progress-bar {
   height: 100%;
   background-color: #e91e63;
   width: 0%;
   transition: width 0.4s ease;
 }
-
 /* tabulka skóre */
 #scoreboard {
   width: 100%;
   border-collapse: collapse;
 }
-
-#scoreboard th, #scoreboard td {
+#scoreboard th,
+#scoreboard td {
   padding: 8px;
   text-align: left;
 }
-
 #scoreboard thead {
   background-color: #f3f3f3;
 }
-
 #scoreboard tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
-
 #scoreboard tbody tr.top-scorer {
   background-color: #fff7c7;
   font-weight: bold;
 }
-
 #scoreboard tbody tr.current-user {
   background-color: #ffe4ec;
 }
-
 /* Motivační hlášky */
 .message {
   margin-top: 10px;
@@ -135,7 +122,6 @@ h2 {
   font-weight: 600;
   color: #d81b60;
 }
-
 /* Odkaz pro nahrávání fotek
  * Zobrazuje se pod seznamem úkolů a bodovacím panelem.
  */
@@ -149,7 +135,6 @@ h2 {
 .upload-link:hover {
   text-decoration: underline;
 }
-
 /* seznam účastnic na domovské stránce */
 .participants-list {
   display: flex;
@@ -157,7 +142,6 @@ h2 {
   justify-content: center;
   gap: 12px;
 }
-
 .participant-link {
   background: #ffffff;
   border-radius: 12px;
@@ -168,12 +152,10 @@ h2 {
   font-weight: 600;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
-
 .participant-link:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
-
 @media (max-width: 600px) {
   h1 {
     font-size: 1.6em;
@@ -192,4 +174,61 @@ h2 {
     flex: 1 1 calc(50% - 20px);
     text-align: center;
   }
+}
+
+/*
+ * Přidané styly pro miniatury a hlavičky
+ */
+/* Malé avatary v tabulce skóre */
+.avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* Kontejner pro skládání avatara nad jméno v tabulce */
+.player-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+/* Velké avatary vedle jména v hlavičce */
+.avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* Kontejner pro hlavičku s avatarem a nadpisem */
+.header-container {
+  display: flex;
+  /* explicitně určíme směr řádků, aby se avatar a text skládaly vedle sebe */
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Základní nastavení pro nadpis uvnitř hlavičky – rušíme defaultní středové zarovnání,
+ * aby se text zarovnal doleva vedle avatara a neodsouval ho pod něj. */
+.header-container h1 {
+  margin: 0;
+  text-align: left;
+}
+/* Avatary na domovské stránce */
+.avatar-index {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* Flex kontejner uvnitř odkazu na domovské stránce pro obrázek a jméno */
+.participant-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }

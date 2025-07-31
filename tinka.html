@@ -10,16 +10,24 @@
 </head>
 <body>
   <div class="container">
-    <h1>Rozlučka – <span id="participant-name">Tínka</span></h1>
+    <!-- Hlavička se jménem a velkým avatarem -->
+    <div class="header-container">
+      <img src="avatars/tinka.png" alt="Tínka" class="avatar-large" />
+      <h1>Rozlučka – <span id="participant-name">Tínka</span></h1>
+    </div>
     <div class="card">
       <h2>Úkoly</h2>
+      <!-- Místo pro seznam úkolů generovaných skriptem -->
       <div id="tasks-list"></div>
+      <!-- Zobrazení aktuálního počtu bodů -->
       <div class="score-display">Body: <span id="score-value">0</span></div>
+      <!-- Progress bar -->
       <div class="progress-container">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
+      <!-- Motivační zpráva -->
       <div id="motivational-message" class="message"></div>
-      <!-- CTA pro nahrávání fotek -->
+      <!-- Odkaz pro nahrávání fotografií -->
       <a class="upload-link" href="https://drive.google.com/drive/folders/1szUl6YqYoKkz0dYKYyi-lcANvDwCo5yC?usp=sharing" target="_blank">📸 Fotky nahrávej sem</a>
     </div>
     <div class="card">
@@ -32,6 +40,7 @@
       </table>
     </div>
   </div>
+  <!-- Firebase SDKs a naše logika -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>

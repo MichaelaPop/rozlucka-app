@@ -34,6 +34,24 @@ const tasks = [
 const MAX_POINTS = tasks.reduce((sum, t) => sum + t.points, 0);
 
 /**
+ * Mapování jmen účastnic na cesty k jejich avatárům.
+ *
+ * Tyto cesty se používají při vykreslování tabulky skóre. Pokud se
+ * přidá nová účastnice, stačí doplnit její jméno a odpovídající
+ * obrázek.
+ */
+const playerImages = {
+  // používáme soubory bez diakritiky, aby GitHub Pages správně obsloužil cesty
+  'Tínka': 'avatars/tinka.png',
+  'Míša': 'avatars/misa.png',
+  'Mája': 'avatars/maja.png',
+  'Masha': 'avatars/masha.png',
+  'Žaneta': 'avatars/zaneta.png',
+  'Sussi': 'avatars/sussi.png',
+  'Tereza': 'avatars/tereza.png'
+};
+
+/**
  * Vrátí motivační hlášku podle aktuálního skóre.
  *
  * @param {number} score Aktuální počet bodů
@@ -104,7 +122,7 @@ function setupPage(participantName) {
     const label = document.createElement('label');
     label.setAttribute('for', checkbox.id);
     // HTML uvnitř labelu – popis úkolu a počet bodů
-    label.innerHTML = `${task.description} <span class="points">(${task.points} bodů)</span>`;
+    label.innerHTML = `${task.description} (${task.points} bodů) `;
 
     // Reakce na změnu stavu checkboxu
     checkbox.addEventListener('change', () => {
@@ -188,12 +206,26 @@ function setupPage(participantName) {
         if (entry.name === participantName) {
           tr.classList.add('current-user');
         }
+        // Název sloupce s profilem a jménem
         const nameTd = document.createElement('td');
-        nameTd.textContent = entry.name;
-        // přidej emoji korunky pro nejlepšího
+        // Vytvoř kontejner, do kterého vložíme malý avatar a jméno
+        const playerContainer = document.createElement('div');
+        playerContainer.classList.add('player-cell');
+        // Malý avatar
+        const img = document.createElement('img');
+        img.classList.add('avatar-small');
+        img.src = playerImages[entry.name] || '';
+        img.alt = entry.name;
+        // Jméno a případná korunka
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = entry.name;
+        // přidej emoji korunky pro nejlepšího, pokud má body
         if (idx === 0 && entry.score > 0) {
-          nameTd.textContent += ' 👑';
+          nameSpan.textContent += ' 👑';
         }
+        playerContainer.appendChild(img);
+        playerContainer.appendChild(nameSpan);
+        nameTd.appendChild(playerContainer);
         const scoreTd = document.createElement('td');
         scoreTd.textContent = entry.score;
         tr.appendChild(nameTd);
