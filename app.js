@@ -13,7 +13,8 @@
 //  - čtvrtý úkol má opravený tvar na „týpkem“
 //  - přidány dva nové úkoly se společnou fotkou se šesti Tomy a bláznivou selfie s mnoha Tomy
 const tasks = [
-  { description: 'Společně vymysleme jméno pro vašeho týpka.', points: 5 },
+  // Opravena formulace podle zpětné vazby – používáme „našeho týpka“
+  { description: 'Společně vymysleme jméno pro našeho týpka.', points: 5 },
   { description: 'Udělejme společnou fotku "Před".', points: 5 },
   { description: 'Vyfoť se s nevěstou v originální póze.', points: 10 },
   { description: 'Udělej si crazy fotku s naším týpkem.', points: 15 },
@@ -24,10 +25,11 @@ const tasks = [
   { description: 'Vyfoť tajně holku, která má na sobě víc růžové než ty.', points: 15 },
   { description: 'Zachyť nejvíc znechucený výraz večera.', points: 20 },
   { description: 'Vyfoť náhodnou věc, která připomíná penis.', points: 25 },
-  { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 },
   // Nové úkoly přidané pro další body navíc
   { description: 'Udělejme fotku se šesti Tomy a nevěstou.', points: 10 },
-  { description: 'Udělej bláznivou selfie s co největším počtem Tomů.', points: 15 }
+  { description: 'Udělej bláznivou selfie s co největším počtem Tomů.', points: 15 },
+  // Úkol s fotkou "PO" byl přesunut na konec seznamu
+  { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 }
 ];
 
 // Celkový počet bodů – slouží pro výpočet procent v progress baru

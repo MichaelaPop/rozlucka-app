@@ -131,6 +131,8 @@ h2 {
   color: #e91e63;
   font-weight: 600;
   text-decoration: none;
+  /* Na desktopech i mobilech zarovnej odkaz pro nahrávání fotek na střed */
+  text-align: center;
 }
 .upload-link:hover {
   text-decoration: underline;
@@ -217,6 +219,17 @@ h2 {
 .header-container h1 {
   margin: 0;
   text-align: left;
+}
+
+/* Na menších obrazovkách skládáme avatar a jméno pod sebe a zarovnáme na střed */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .header-container h1 {
+    text-align: center;
+  }
 }
 /* Avatary na domovské stránce */
 .avatar-index {
