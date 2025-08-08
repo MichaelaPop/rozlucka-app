@@ -267,4 +267,26 @@ h2 {
   accent-color: #e91e63; /* růžová */
   border-radius: 6px;
 }
+/* Podúkol – jisté odsazení i na mobilu */
+.task-item.subtask-item {
+  margin-left: 16px !important;
+  padding-left: 12px;
+  border-left: 3px solid #ffd1e8; /* jemná vodicí linka */
+}
+
+/* Ať je checkbox i u podúkolu vždy vedle textu */
+.task-item,
+.task-item.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .task-item,
+  .task-item.subtask-item {
+    flex-direction: row !important;   /* přetlačí cokoli jiného */
+    align-items: center !important;
+  }
+}
 
