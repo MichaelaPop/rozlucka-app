@@ -1,10 +1,10 @@
 /*
  * Hlavní skript pro aplikaci rozlučky se svobodou (Firestore verze).
- * - odstraněny "(opakovat)"
- * - přidány subDescription + subPoints u opakovatelných úkolů
- * - podúkol se vždy vykreslí přímo pod svým hlavním úkolem (odsazeně)
- * - při odškrtnutí hlavního úkolu podúkol zmizí
- * - baseScore (hlavní) + dynamicScore (podúkoly) => score
+ * Varianta B: podúkol + hvězdičky vedle něj jako historie splnění.
+ * - Podúkol (checkbox) přičte +5 bodů, hned se odškrtne a přidá hvězdičku.
+ * - Klik na hvězdičku odebere jednu hvězdu a −5 bodů.
+ * - Podúkol + hvězdičky se zobrazují pouze, když je hlavní úkol zaškrtnutý.
+ * - Body z podúkolů se sčítají a započítávají do celkového skóre.
  */
 
 // ===== Seznam úkolů a bodů =====
@@ -27,7 +27,7 @@ const tasks = [
   { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 }
 ];
 
-// Celkový počet bodů – pro výpočet procent v progress baru (jen hlavní úkoly)
+// Základ pro progress bar (jen hlavní úkoly)
 const MAX_POINTS = tasks.reduce((sum, t) => sum + t.points, 0);
 
 // Mapování jmen účastnic na avatary (uprav dle reálných souborů)
@@ -54,6 +54,14 @@ function getMotivationalMessage(score) {
   return '👑 Získáváš titul korunovaná ultrapařmenka! 👑';
 }
 
+// ===== Pomocné funkce =====
+function computeDynamicFromCounts(repeatCounts) {
+  return repeatCounts.reduce((sum, count, i) => {
+    const pts = tasks[i].subPoints || 5;
+    return sum + (count * (tasks[i].subDescription ? pts : 0));
+  }, 0);
+}
+
 // ===== Hlavní inicializace stránky účastnice =====
 function setupPage(participantName) {
   if (!firebase.apps || firebase.apps.length === 0) {
@@ -63,7 +71,7 @@ function setupPage(participantName) {
 
   // DOM prvky
   const nameElement = document.getElementById('participant-name');
-  const tasksContainer = document.getElementById('tasks-list'); // kontejner <div> s úkoly
+  const tasksContainer = document.getElementById('tasks-list'); // <div> kontejner úkolů
   const scoreValueElement = document.getElementById('score-value');
   const progressBar = document.getElementById('progress-bar');
   const messageElement = document.getElementById('motivational-message');
@@ -71,27 +79,26 @@ function setupPage(participantName) {
 
   if (nameElement) nameElement.textContent = participantName;
 
-  // Dokument ve Firestore pro tuto účastnici
   const docRef = db.collection('scores').doc(participantName);
 
-  // Lokální stav hlavních úkolů (checkboxy)
+  // Lokální stav hlavních úkolů
   let currentTasksStatus = tasks.map(() => false);
 
-  // Držáky na DOM uzly podúkolů: index hlavního úkolu -> jeho podúkol (div)
+  // Držáky na DOM uzly podúkolů: index hlavního úkolu -> element podúkolu
   const subTaskNodes = {};
 
-  // Pomocná funkce: vytvoř podúkol a vlož ho hned POD konkrétní hlavní úkol
-  function createSubTaskElement(task, anchorEl, taskIndex) {
+  // Vytvoř podúkol + hvězdičky hned POD daný hlavní úkol
+  function createOrUpdateSubtask(task, anchorEl, taskIndex, repeatCount) {
     if (!task.subDescription) return;
 
-    // Smaž předchozí podúkol pro daný hlavní úkol (ať je vždy jen jeden)
+    // Smaž starý uzel, ať je vždy jen jeden
     if (subTaskNodes[taskIndex]) {
       subTaskNodes[taskIndex].remove();
       delete subTaskNodes[taskIndex];
     }
 
     const item = document.createElement('div');
-    item.className = 'task-item subtask-item'; // přidej do CSS odsazení .subtask-item { margin-left: 24px; }
+    item.className = 'task-item subtask-item';
 
     const subCheckbox = document.createElement('input');
     subCheckbox.type = 'checkbox';
@@ -99,31 +106,88 @@ function setupPage(participantName) {
     const subLabel = document.createElement('label');
     subLabel.innerHTML = `${task.subDescription} (${task.subPoints || 5} bodů)`;
 
+    // Hvězdičky (historie splnění)
+    const stars = document.createElement('div');
+    stars.className = 'subtask-stars';
+    // Vyrenderuj repeatCount hvězd
+    function renderStars(count) {
+      stars.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.className = 'star';
+        s.textContent = '⭐';
+        s.title = 'Kliknutím odebereš 1 splnění (-5 b)';
+        s.addEventListener('click', () => {
+          // Odečti 1 splnění (a body)
+          docRef.get().then((doc) => {
+            const data = doc.exists ? doc.data() : {};
+            const rc = Array.isArray(data.repeatCounts) ? data.repeatCounts.slice() : tasks.map(() => 0);
+            if (rc[taskIndex] > 0) {
+              rc[taskIndex] -= 1;
+              const baseScore = (Array.isArray(data.tasks) ? data.tasks : tasks.map(() => false))
+                .reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
+              const dynamicScore = computeDynamicFromCounts(rc);
+              const score = baseScore + dynamicScore;
+              return docRef.set({
+                name: participantName,
+                tasks: data.tasks || tasks.map(() => false),
+                repeatCounts: rc,
+                baseScore,
+                dynamicScore,
+                score
+              });
+            }
+          }).then(() => {
+            // Přerenderuj hvězdy po odečtu
+            docRef.get().then((doc) => {
+              const dataNow = doc.data() || {};
+              const rcNow = Array.isArray(dataNow.repeatCounts) ? dataNow.repeatCounts : tasks.map(() => 0);
+              renderStars(rcNow[taskIndex] || 0);
+            });
+          });
+        });
+        stars.appendChild(s);
+      }
+    }
+    renderStars(repeatCount || 0);
+
+    // Zaškrtnutí podúkolu -> +1 hvězda a +5 bodů, checkbox se odškrtne
     subCheckbox.addEventListener('change', () => {
       if (subCheckbox.checked) {
-        const added = task.subPoints || 5;
-        // Přičti body k dynamickému skóre a celkovému skóre
         docRef.get().then((doc) => {
           const data = doc.exists ? doc.data() : {};
-          const currentScore = data.score || 0;
-          const dynamicScore = data.dynamicScore || 0;
-          return docRef.update({
-            dynamicScore: dynamicScore + added,
-            score: currentScore + added
+          const rc = Array.isArray(data.repeatCounts) ? data.repeatCounts.slice() : tasks.map(() => 0);
+          rc[taskIndex] = (rc[taskIndex] || 0) + 1;
+
+          const baseScore = (Array.isArray(data.tasks) ? data.tasks : tasks.map(() => false))
+            .reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
+          const dynamicScore = computeDynamicFromCounts(rc);
+          const score = baseScore + dynamicScore;
+
+          return docRef.set({
+            name: participantName,
+            tasks: data.tasks || tasks.map(() => false),
+            repeatCounts: rc,
+            baseScore,
+            dynamicScore,
+            score
           });
         }).then(() => {
-          // Po připsání bodů vytvoř další podúkol pod TÍM SAMÝM hlavním úkolem
-          item.remove();
-          delete subTaskNodes[taskIndex];
-          createSubTaskElement(task, anchorEl, taskIndex);
+          // odškrtnout subcheckbox a přerenderovat hvězdy
+          subCheckbox.checked = false;
+          docRef.get().then((doc) => {
+            const dataNow = doc.data() || {};
+            const rcNow = Array.isArray(dataNow.repeatCounts) ? dataNow.repeatCounts : tasks.map(() => 0);
+            renderStars(rcNow[taskIndex] || 0);
+          });
         });
       }
     });
 
     item.appendChild(subCheckbox);
     item.appendChild(subLabel);
+    item.appendChild(stars);
 
-    // Klíčový moment: vložit podúkol těsně POD hlavní úkol
     anchorEl.insertAdjacentElement('afterend', item);
     subTaskNodes[taskIndex] = item;
   }
@@ -147,28 +211,32 @@ function setupPage(participantName) {
       const oldChecked = currentTasksStatus[idx];
       currentTasksStatus[idx] = checkbox.checked;
 
-      // Přepočítej základní body
-      const baseScore = currentTasksStatus.reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
-
-      // Ulož stav + body
       docRef.get().then((doc) => {
         const data = doc.exists ? doc.data() : {};
-        const dynamicScore = data.dynamicScore || 0;
+        const repeatCounts = Array.isArray(data.repeatCounts) ? data.repeatCounts : tasks.map(() => 0);
+        const baseScore = currentTasksStatus.reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
+        const dynamicScore = computeDynamicFromCounts(repeatCounts);
         const totalScore = baseScore + dynamicScore;
+
         return docRef.set({
           name: participantName,
           tasks: currentTasksStatus,
-          baseScore: baseScore,
-          dynamicScore: dynamicScore,
+          repeatCounts,
+          baseScore,
+          dynamicScore,
           score: totalScore
         });
       }).then(() => {
-        // Nově zaškrtnutý hlavní úkol => vytvoř podúkol přímo pod ním
         if (task.subDescription && checkbox.checked && !oldChecked) {
-          createSubTaskElement(task, item, idx);
+          // při prvním zaškrtnutí vykresli subtask + hvězdy
+          docRef.get().then((doc) => {
+            const data = doc.data() || {};
+            const rc = Array.isArray(data.repeatCounts) ? data.repeatCounts : tasks.map(() => 0);
+            createOrUpdateSubtask(task, item, idx, rc[idx] || 0);
+          });
         }
-        // Odškrtnutý hlavní úkol => podúkol (pokud existuje) schovej
         if (!checkbox.checked && subTaskNodes[idx]) {
+          // hlavní odškrtnutý -> schovej subtask (data necháme)
           subTaskNodes[idx].remove();
           delete subTaskNodes[idx];
         }
@@ -188,7 +256,8 @@ function setupPage(participantName) {
         score: 0,
         baseScore: 0,
         dynamicScore: 0,
-        tasks: tasks.map(() => false)
+        tasks: tasks.map(() => false),
+        repeatCounts: tasks.map(() => 0)
       });
     }
   });
@@ -197,8 +266,9 @@ function setupPage(participantName) {
   docRef.onSnapshot((doc) => {
     if (!doc.exists) return;
     const data = doc.data();
+    const repeatCounts = Array.isArray(data.repeatCounts) ? data.repeatCounts : tasks.map(() => 0);
     currentTasksStatus = Array.isArray(data.tasks) ? data.tasks.slice() : tasks.map(() => false);
-    const currentScore = data.score || 0;
+    const currentScore = (data.baseScore || 0) + computeDynamicFromCounts(repeatCounts);
 
     // Obnov hlavní checkboxy
     tasks.forEach((task, index) => {
@@ -212,8 +282,8 @@ function setupPage(participantName) {
       const cb = document.getElementById('task-' + index);
       const mainItem = cb ? cb.closest('.task-item') : null;
       if (cb && cb.checked) {
-        if (mainItem && !subTaskNodes[index]) {
-          createSubTaskElement(task, mainItem, index);
+        if (mainItem) {
+          createOrUpdateSubtask(task, mainItem, index, repeatCounts[index] || 0);
         }
       } else if (subTaskNodes[index]) {
         subTaskNodes[index].remove();
@@ -233,10 +303,14 @@ function setupPage(participantName) {
     const scores = [];
     snapshot.forEach((d) => {
       const val = d.data();
-      scores.push({ name: val.name || d.id, score: val.score || 0 });
+      const repeatCounts = Array.isArray(val.repeatCounts) ? val.repeatCounts : tasks.map(() => 0);
+      const dynamicScore = computeDynamicFromCounts(repeatCounts);
+      const baseScore = val.baseScore || 0;
+      scores.push({ name: val.name || d.id, score: (baseScore + dynamicScore) || 0 });
     });
     scores.sort((a, b) => b.score - a.score);
 
+    const leaderboardBody = document.getElementById('scoreboard-body');
     if (leaderboardBody) {
       leaderboardBody.innerHTML = '';
       scores.forEach((entry, idx) => {
