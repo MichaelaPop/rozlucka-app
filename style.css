@@ -245,10 +245,21 @@ h2 {
   align-items: center;
   gap: 6px;
 }
+
+/* Podúkoly a hvězdičky */
+.subtask-item { 
+  margin-left: 24px; 
+  opacity: .95; 
 }
-.subtask-item { margin-left: 24px; opacity: .95; }
-.subtask-stars .star { cursor: pointer; }
-.subtask-item label { font-style: italic; margin-right: 8px; }
+.subtask-item label { 
+  font-style: italic; 
+  margin-right: 8px; 
+}
+.subtask-stars .star { 
+  cursor: pointer; 
+}
+
+/* Větší, hezčí checkboxy */
 .task-item input[type="checkbox"],
 .subtask-item input[type="checkbox"] {
   width: 26px;
