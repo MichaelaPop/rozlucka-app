@@ -113,6 +113,41 @@ function setupPage(participantName) {
   let currentTasksStatus = tasks.map(() => false);
 
   // Vytvoř UI pro každý úkol
+  // Pomocná funkce pro vytváření podúkolů.  Každý podúkol má vlastní
+  // checkbox; po zaškrtnutí přidá hráčce body a vygeneruje nový podúkol.
+  function createSubTaskElement(task) {
+    // Pokud úkol nemá definovaný podúkol, nic nedělej
+    if (!task.subDescription) return;
+    const item = document.createElement('div');
+    item.className = 'task-item subtask-item';
+    const subCheckbox = document.createElement('input');
+    subCheckbox.type = 'checkbox';
+    const subLabel = document.createElement('label');
+    subLabel.innerHTML = `${task.subDescription} (${task.subPoints || 5} bodů)`;
+    subCheckbox.addEventListener('change', () => {
+      if (subCheckbox.checked) {
+        const added = task.subPoints || 5;
+        // Přičti body do dynamického skóre a uprav celkové skóre
+        docRef.get().then((doc) => {
+          const data = doc.exists ? doc.data() : {};
+          const currentScore = data.score || 0;
+          const dynamicScore = data.dynamicScore || 0;
+          const newDynamic = dynamicScore + added;
+          const newScore = currentScore + added;
+          docRef.update({ dynamicScore: newDynamic, score: newScore });
+        });
+        // Odstraň starý podúkol z DOMu
+        tasksContainer.removeChild(item);
+        // Vytvoř další podúkol (takže lze úkol plnit opakovaně)
+        createSubTaskElement(task);
+      }
+    });
+    item.appendChild(subCheckbox);
+    item.appendChild(subLabel);
+    tasksContainer.appendChild(item);
+  }
+
+  // Vytvoř UI pro každý úkol
   tasks.forEach((task, index) => {
     const item = document.createElement('div');
     item.className = 'task-item';
@@ -124,20 +159,33 @@ function setupPage(participantName) {
 
     const label = document.createElement('label');
     label.setAttribute('for', checkbox.id);
-    // HTML uvnitř labelu – popis úkolu a počet bodů
-    label.innerHTML = `${task.description} (${task.points} bodů) `;
+    // Zobraz popis úkolu a počet bodů
+    label.innerHTML = `${task.description} (${task.points} bodů)`;
 
-    // Reakce na změnu stavu checkboxu
     checkbox.addEventListener('change', () => {
       const idx = parseInt(checkbox.dataset.index, 10);
+      const oldChecked = currentTasksStatus[idx];
       currentTasksStatus[idx] = checkbox.checked;
-      // Spočítej nový počet bodů
-      const newScore = currentTasksStatus.reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
-      // Zapiš do Firestore
-      docRef.set({
-        name: participantName,
-        tasks: currentTasksStatus,
-        score: newScore
+      // Spočítej nový počet bodů za základní úkoly
+      const baseScore = currentTasksStatus.reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
+      // Načti dosavadní dynamické body (pokud existují)
+      docRef.get().then((doc) => {
+        const data = doc.exists ? doc.data() : {};
+        const dynamicScore = data.dynamicScore || 0;
+        const totalScore = baseScore + dynamicScore;
+        // Zapiš do Firestore jak základní, tak dynamické body a aktuální úkoly
+        docRef.set({
+          name: participantName,
+          tasks: currentTasksStatus,
+          baseScore: baseScore,
+          dynamicScore: dynamicScore,
+          score: totalScore
+        });
+        // Pokud je úkol opakovatelný a byl právě poprvé zaškrtnut,
+        // vytvoř první podúkol
+        if (task.subDescription && checkbox.checked && !oldChecked) {
+          createSubTaskElement(task);
+        }
       });
     });
 
@@ -152,6 +200,8 @@ function setupPage(participantName) {
       docRef.set({
         name: participantName,
         score: 0,
+        baseScore: 0,
+        dynamicScore: 0,
         tasks: tasks.map(() => false)
       });
     }
@@ -177,7 +227,8 @@ function setupPage(participantName) {
       // Aktualizuj progress bar
       const percent = (currentScore / MAX_POINTS) * 100;
       if (progressBar) {
-        progressBar.style.width = percent + '%';
+        // Nepřetáhni progress bar přes 100 %
+        progressBar.style.width = Math.min(percent, 100) + '%';
       }
       // Motivační hláška
       if (messageElement) {
