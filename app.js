@@ -13,22 +13,21 @@
 //  - čtvrtý úkol má opravený tvar na „týpkem“
 //  - přidány dva nové úkoly se společnou fotkou se šesti Tomy a bláznivou selfie s mnoha Tomy
 const tasks = [
-  // Opravena formulace podle zpětné vazby – používáme „našeho týpka“
   { description: 'Společně vymysleme jméno pro našeho týpka.', points: 5 },
   { description: 'Udělejme společnou fotku "Před".', points: 5 },
-  { description: 'Vyfoť se s nevěstou v originální póze.', points: 10 },
-  { description: 'Udělej si crazy fotku s naším týpkem.', points: 15 },
-  { description: 'Vyfoť tajně nejulítlejší outfit večera.', points: 20 },
-  { description: 'Vyfoť tajně někoho, kdo vypadá jako známá osobnost.', points: 20 },
-  { description: 'Udělej si selfie s naprostým cizincem.', points: 30 },
-  { description: 'Vyfoť nejvíc sexy týpka večera.', points: 25 },
+  { description: 'Vyfoť se s nevěstou v originální póze. (opakovat)', points: 10 },
+  { description: 'Udělej si crazy fotku s naším týpkem. (opakovat)', points: 15 },
+  { description: 'Měj na sobě alespoň 15 minut "Sexy Borat" triko.', points: 45 },
+  { description: 'Vyvolej u někoho záchvat smíchu. (opakovat)', points: 50 },
+  { description: 'Vyfoť tajně nejulítlejší outfit večera. (opakovat)', points: 20 },
+  { description: 'Vyfoť tajně někoho, kdo vypadá jako známá osobnost. (opakovat)', points: 20 },
+  { description: 'Udělej si selfie s naprostým cizincem. (opakovat)', points: 30 },
+  { description: 'Vyfoť nejvíc sexy týpka večera. (opakovat)', points: 25 },
   { description: 'Vyfoť tajně holku, která má na sobě víc růžové než ty.', points: 15 },
-  { description: 'Zachyť nejvíc znechucený výraz večera.', points: 20 },
-  { description: 'Vyfoť náhodnou věc, která připomíná penis.', points: 25 },
-  // Nové úkoly přidané pro další body navíc
+  { description: 'Zachyť nejvíc znechucený výraz večera. (opakovat)', points: 20 },
+  { description: 'Vyfoť náhodnou věc, která připomíná penis. (opakovat)', points: 25 },
   { description: 'Udělejme fotku se šesti Tomy a nevěstou.', points: 10 },
   { description: 'Udělej bláznivou selfie s co největším počtem Tomů.', points: 15 },
-  // Úkol s fotkou "PO" byl přesunut na konec seznamu
   { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 }
 ];
 
@@ -60,22 +59,24 @@ const playerImages = {
  * @returns {string} Text hlášky
  */
 function getMotivationalMessage(score) {
-  // Motivace je odstupňovaná podle počtu získaných bodů.  Přidali jsme
-  // extra stupeň pro nejvyšší skóre nad 170 bodů, aby se správně
-  // zohlednil vyšší maximální počet bodů po přidání nových úkolů.
   if (!score || score === 0) {
     return 'Holka, začni! Tohle není kavárna.';
-  } else if (score <= 30) {
+  } else if (score <= 29) {
     return 'Už to jiskří, ale chce to přidat!';
-  } else if (score <= 70) {
+  } else if (score <= 59) {
     return 'Rozjíždíš to! Jsi na dobré cestě ke slávě!';
-  } else if (score <= 120) {
+  } else if (score <= 89) {
     return 'Už jsi legenda večera… skoro!';
-  } else if (score <= 170) {
+  } else if (score <= 119) {
+    return 'Tohle už není hra. To je tvá chvíle slávy';
+  } else if (score <= 149) {
     return '🔥 Královno chaosu! Ostatní nestíhají!';
+  } else if (score <= 169) {
+    return 'Už máš pomalu víc bodů než tvoje důstojnost!';
+  } else if (score <= 199) {
+    return 'Nevěsta je určitě pyšná… nebo aspoň pobavená.';
   }
-  // Nad 170 bodů udělujeme speciální titul ultrapařmenky
-  return '🔥🔥🔥Získáváš titul korunovaná ultrapařmenka!🔥🔥🔥';
+  return '👑 Získáváš titul korunovaná ultrapařmenka! 👑';
 }
 
 /**
