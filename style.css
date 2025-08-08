@@ -289,4 +289,42 @@ h2 {
     align-items: center !important;
   }
 }
+.subtask-stars .star {
+  color: #e91e63; /* sytě růžová */
+  font-size: 1.4em;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.subtask-stars .star:hover {
+  transform: scale(1.3);
+  color: #ff4081; /* světlejší růžová při hoveru */
+}
+.task-item {
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: background 0.3s ease;
+}
+
+.task-item:hover {
+  background: #ffe4ec; /* jemný růžový podklad při hoveru */
+}
+
+.task-item.completed label {
+  text-decoration: line-through;
+  color: #888;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+/* Podúkoly ještě s levým růžovým proužkem */
+.subtask-item {
+  border-left: 4px solid #e91e63;
+  background: #fff5f9;
+}
+.progress-bar {
+  background: linear-gradient(90deg, #e91e63, #ff80ab);
+}
 
