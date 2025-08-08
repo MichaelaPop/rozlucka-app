@@ -245,13 +245,6 @@ h2 {
   align-items: center;
   gap: 6px;
 }
-/* Podúkoly – zobrazení pod hlavním úkolem */
-.subtask-item {
-  margin-left: 24px; /* odsazení doprava */
-  opacity: 0.95;
-}
-.subtask-item label {
-  font-style: italic;
 }
 .subtask-item { margin-left: 24px; opacity: .95; }
 .subtask-stars .star { cursor: pointer; }
