@@ -1,13 +1,13 @@
 /*
  * Hlavní skript pro aplikaci rozlučky se svobodou (Firestore verze).
  * - odstraněny "(opakovat)"
- * - přidány subDescription + subPoints tam, kde se má opakovat
+ * - přidány subDescription + subPoints u opakovatelných úkolů
  * - podúkol se vždy vykreslí přímo pod svým hlavním úkolem (odsazeně)
  * - při odškrtnutí hlavního úkolu podúkol zmizí
  * - baseScore (hlavní) + dynamicScore (podúkoly) => score
  */
 
-// Seznam úkolů a bodů
+// ===== Seznam úkolů a bodů =====
 const tasks = [
   { description: 'Společně vymysleme jméno pro našeho týpka.', points: 5 },
   { description: 'Udělejme společnou fotku "Před".', points: 5 },
@@ -27,10 +27,10 @@ const tasks = [
   { description: 'Udělejme společnou fotku "PO" (před odchodem první z nás).', points: 10 }
 ];
 
-// Celkový počet bodů – pro výpočet procent v progress baru (základní úkoly)
+// Celkový počet bodů – pro výpočet procent v progress baru (jen hlavní úkoly)
 const MAX_POINTS = tasks.reduce((sum, t) => sum + t.points, 0);
 
-// Mapování jmen účastnic na avatary (příklady; uprav dle svých souborů)
+// Mapování jmen účastnic na avatary (uprav dle reálných souborů)
 const playerImages = {
   'Tínka': 'avatars/tinka.png',
   'Míša': 'avatars/misa.png',
@@ -41,6 +41,7 @@ const playerImages = {
   'Tereza': 'avatars/tereza.png'
 };
 
+// ===== Motivační hlášky =====
 function getMotivationalMessage(score) {
   if (!score || score === 0) return 'Holka, začni! Tohle není kavárna.';
   if (score <= 29) return 'Už to jiskří, ale chce to přidat!';
@@ -53,14 +54,16 @@ function getMotivationalMessage(score) {
   return '👑 Získáváš titul korunovaná ultrapařmenka! 👑';
 }
 
+// ===== Hlavní inicializace stránky účastnice =====
 function setupPage(participantName) {
   if (!firebase.apps || firebase.apps.length === 0) {
     firebase.initializeApp(firebaseConfig);
   }
   const db = firebase.firestore();
 
+  // DOM prvky
   const nameElement = document.getElementById('participant-name');
-  const tasksContainer = document.getElementById('tasks-list');
+  const tasksContainer = document.getElementById('tasks-list'); // kontejner <div> s úkoly
   const scoreValueElement = document.getElementById('score-value');
   const progressBar = document.getElementById('progress-bar');
   const messageElement = document.getElementById('motivational-message');
@@ -68,23 +71,27 @@ function setupPage(participantName) {
 
   if (nameElement) nameElement.textContent = participantName;
 
+  // Dokument ve Firestore pro tuto účastnici
   const docRef = db.collection('scores').doc(participantName);
 
-  // Lokální stav checkboxů hlavních úkolů
+  // Lokální stav hlavních úkolů (checkboxy)
   let currentTasksStatus = tasks.map(() => false);
-  // Držáky na DOM uzly podúkolů (index hlavního úkolu -> element)
+
+  // Držáky na DOM uzly podúkolů: index hlavního úkolu -> jeho podúkol (div)
   const subTaskNodes = {};
 
-  // Pomocná funkce: vytvoř a vlož podúkol hned pod konkrétní hlavní úkol
+  // Pomocná funkce: vytvoř podúkol a vlož ho hned POD konkrétní hlavní úkol
   function createSubTaskElement(task, anchorEl, taskIndex) {
     if (!task.subDescription) return;
-    // Odstraň starý případný podúkol (aby byl vždy jen jeden aktivní)
+
+    // Smaž předchozí podúkol pro daný hlavní úkol (ať je vždy jen jeden)
     if (subTaskNodes[taskIndex]) {
       subTaskNodes[taskIndex].remove();
       delete subTaskNodes[taskIndex];
     }
+
     const item = document.createElement('div');
-    item.className = 'task-item subtask-item'; // přidej v CSS odsazení .subtask-item { margin-left: 24px; }
+    item.className = 'task-item subtask-item'; // přidej do CSS odsazení .subtask-item { margin-left: 24px; }
 
     const subCheckbox = document.createElement('input');
     subCheckbox.type = 'checkbox';
@@ -95,6 +102,7 @@ function setupPage(participantName) {
     subCheckbox.addEventListener('change', () => {
       if (subCheckbox.checked) {
         const added = task.subPoints || 5;
+        // Přičti body k dynamickému skóre a celkovému skóre
         docRef.get().then((doc) => {
           const data = doc.exists ? doc.data() : {};
           const currentScore = data.score || 0;
@@ -104,7 +112,7 @@ function setupPage(participantName) {
             score: currentScore + added
           });
         }).then(() => {
-          // Po připsání bodů obnov další podúkol pod stejným hlavním úkolem
+          // Po připsání bodů vytvoř další podúkol pod TÍM SAMÝM hlavním úkolem
           item.remove();
           delete subTaskNodes[taskIndex];
           createSubTaskElement(task, anchorEl, taskIndex);
@@ -114,6 +122,8 @@ function setupPage(participantName) {
 
     item.appendChild(subCheckbox);
     item.appendChild(subLabel);
+
+    // Klíčový moment: vložit podúkol těsně POD hlavní úkol
     anchorEl.insertAdjacentElement('afterend', item);
     subTaskNodes[taskIndex] = item;
   }
@@ -137,8 +147,10 @@ function setupPage(participantName) {
       const oldChecked = currentTasksStatus[idx];
       currentTasksStatus[idx] = checkbox.checked;
 
+      // Přepočítej základní body
       const baseScore = currentTasksStatus.reduce((sum, checked, i) => sum + (checked ? tasks[i].points : 0), 0);
 
+      // Ulož stav + body
       docRef.get().then((doc) => {
         const data = doc.exists ? doc.data() : {};
         const dynamicScore = data.dynamicScore || 0;
@@ -151,11 +163,11 @@ function setupPage(participantName) {
           score: totalScore
         });
       }).then(() => {
-        // Po prvním zaškrtnutí hlavního úkolu zobraz hned pod ním podúkol
+        // Nově zaškrtnutý hlavní úkol => vytvoř podúkol přímo pod ním
         if (task.subDescription && checkbox.checked && !oldChecked) {
           createSubTaskElement(task, item, idx);
         }
-        // Když se hlavní úkol odškrtne (unchecked), schovej případný podúkol
+        // Odškrtnutý hlavní úkol => podúkol (pokud existuje) schovej
         if (!checkbox.checked && subTaskNodes[idx]) {
           subTaskNodes[idx].remove();
           delete subTaskNodes[idx];
@@ -188,7 +200,7 @@ function setupPage(participantName) {
     currentTasksStatus = Array.isArray(data.tasks) ? data.tasks.slice() : tasks.map(() => false);
     const currentScore = data.score || 0;
 
-    // Obnov checkboxy hlavních úkolů
+    // Obnov hlavní checkboxy
     tasks.forEach((task, index) => {
       const cb = document.getElementById('task-' + index);
       if (cb) cb.checked = !!currentTasksStatus[index];
@@ -224,6 +236,7 @@ function setupPage(participantName) {
       scores.push({ name: val.name || d.id, score: val.score || 0 });
     });
     scores.sort((a, b) => b.score - a.score);
+
     if (leaderboardBody) {
       leaderboardBody.innerHTML = '';
       scores.forEach((entry, idx) => {
