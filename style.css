@@ -159,19 +159,19 @@ h2 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 @media (max-width: 600px) {
-  h1 {
-    font-size: 1.6em;
-  }
-  h2 {
-    font-size: 1.2em;
-  }
+  h1 { font-size: 1.6em; }
+  h2 { font-size: 1.2em; }
+
+  /* držet checkbox VEDLE textu i na mobilu */
   .task-item {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
   }
   .task-item input[type="checkbox"] {
-    margin-bottom: 6px;
+    margin: 0 10px 0 0; /* žádné svislé odskoky */
   }
+
   .participant-link {
     flex: 1 1 calc(50% - 20px);
     text-align: center;
@@ -256,3 +256,11 @@ h2 {
 .subtask-item { margin-left: 24px; opacity: .95; }
 .subtask-stars .star { cursor: pointer; }
 .subtask-item label { font-style: italic; margin-right: 8px; }
+.task-item input[type="checkbox"],
+.subtask-item input[type="checkbox"] {
+  width: 26px;
+  height: 26px;
+  accent-color: #e91e63; /* růžová */
+  border-radius: 6px;
+}
+
