@@ -115,7 +115,7 @@ function setupPage(participantName) {
       for (let i = 0; i < count; i++) {
         const s = document.createElement('span');
         s.className = 'star';
-        s.textContent = '⭐';
+        s.textContent = '❤';
         s.title = 'Kliknutím odebereš 1 splnění (-5 b)';
         s.addEventListener('click', () => {
           // Odečti 1 splnění (a body)
