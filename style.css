@@ -253,3 +253,6 @@ h2 {
 .subtask-item label {
   font-style: italic;
 }
+.subtask-item { margin-left: 24px; opacity: .95; }
+.subtask-stars .star { cursor: pointer; }
+.subtask-item label { font-style: italic; margin-right: 8px; }
