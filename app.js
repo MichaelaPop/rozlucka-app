@@ -297,6 +297,32 @@ function setupPage(participantName) {
     if (progressBar) progressBar.style.width = Math.min(percent, 100) + '%';
     if (messageElement) messageElement.textContent = getMotivationalMessage(currentScore);
   });
+// Funkce pro spuštění konfet
+function launchConfetti() {
+  if (typeof confetti === 'function') {
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.6 }
+    });
+  }
+}
+
+// Při kliknutí na hlavní úkol
+document.addEventListener('change', function(e) {
+  if (e.target.matches('.task-item input[type="checkbox"]') && e.target.checked) {
+    launchConfetti();
+  }
+});
+
+// Při kliknutí na hvězdičku
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('star')) {
+    e.target.classList.add('pulse');
+    setTimeout(() => e.target.classList.remove('pulse'), 400);
+    launchConfetti();
+  }
+});
 
   // Live leaderboard
   db.collection('scores').onSnapshot((snapshot) => {
