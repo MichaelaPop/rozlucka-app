@@ -9,8 +9,8 @@
 
 // ===== Seznam úkolů a bodů =====
 const tasks = [
-  { description: 'Společně vymysleme jméno pro našeho týpka.', points: 5 },
   { description: 'Udělejme společnou fotku "Před".', points: 5 },
+  { description: 'Společně vymysleme jméno pro našeho týpka.', points: 5 },
   { description: 'Vyfoť se s nevěstou v originální póze.', points: 10, subDescription: 'Udělej si další fotku s nevěstou.', subPoints: 5 },
   { description: 'Udělej si crazy fotku s naším týpkem.', points: 15, subDescription: 'Znovu se vyfoť s naším týpkem.', subPoints: 5 },
   { description: 'Měj na sobě alespoň 15 minut "Sexy Borat" triko.', points: 45 },
